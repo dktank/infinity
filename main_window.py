@@ -6,6 +6,23 @@ import datetime
 from PyQt5 import QtWidgets as QTW
 from PyQt5 import QtCore as QTC
 from PyQt5 import QtGui  as QTG
+
+
+
+
+import skimage
+from skimage import data
+from skimage.filters import threshold_otsu
+from skimage.segmentation import clear_border
+from skimage.measure import label
+from skimage.morphology import closing, square
+from skimage.measure import regionprops
+from skimage.color import label2rgb
+import cv2
+import numpy as np
+import sys
+
+
 """
 from PyQt5.QtWidgets import (
     QWidget, QMainWindow, QAction,
@@ -131,6 +148,15 @@ class IFMainWindow(QTW.QMainWindow):
 
         :return:
         """
+        self.p2()
+
+        pm = QTG.QPixmap(tar)
+
+        self.main_qw.l2.setPixmap(pm)
+
+
+    def p1(self):
+
         # cv2 读取文件
         original = cv2.imread(SRC)
         output = original.copy()
@@ -145,19 +171,39 @@ class IFMainWindow(QTW.QMainWindow):
         bitwise_not = cv2.bitwise_not(threshold)
 
         # 检测轮廓
-        image, cnts, hierarchy = cv2.findContours(bitwise_not, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        image, cnts, hierarchy = cv2.findContours(bitwise_not, cv2.RETR_TREE,
+                                                  cv2.CHAIN_APPROX_NONE)
+                                                  #cv2.CHAIN_APPROX_SIMPLE)
 
-        #(bitwise_not, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        # (bitwise_not, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
         for cnt in cnts:
             # 上色
-            color = cv2.cvtColor(numpy.uint8([[[random.randint(0, 170), random.randint(150, 250), random.randint(150, 255)]]]),
-                         cv2.COLOR_HSV2BGR)[0, 0]
+            color = cv2.cvtColor(
+                numpy.uint8([[[random.randint(0, 170), random.randint(150, 250), random.randint(150, 255)]]]),
+                cv2.COLOR_HSV2BGR)[0, 0]
 
             cv2.drawContours(output, [cnt], 0, [int(i) for i in color], -1)
 
         cv2.imwrite(tar, output)
 
-        pm = QTG.QPixmap(tar)
+    def p2(self):
 
-        self.main_qw.l2.setPixmap(pm)
+        img = data.imread(SRC, 1)
+        thresh = threshold_otsu(img)
+        bw = closing(img > thresh, square(1))
+
+        cleared = bw.copy()
+        clear_border(cleared)
+
+        label_image = label(cleared)
+        borders = np.logical_xor(bw, cleared)
+
+        label_image[borders] = -1
+        colors = np.random.rand(300, 3)
+        background = np.random.rand(3)
+        image_label_overlay = label2rgb(label_image, image=img, colors=colors, bg_color=background)
+        output = image_label_overlay * 255
+
+        cv2.imwrite(tar, output)
+
