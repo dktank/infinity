@@ -1,2 +1,6 @@
-# infinity
-python3.5  PyQt 5.10
+
+
+runtime env
+
+python3.5.3 
+PyQt 5.10
