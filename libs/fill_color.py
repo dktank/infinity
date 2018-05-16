@@ -45,7 +45,7 @@ def fill_color_cv2(src, tar, config=None ):
     bgr2gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)  # 转灰度图
 
     # 二值化
-    ret, threshold = cv2.threshold(bgr2gray, 170, 255, cv2.THRESH_BINARY)
+    ret, threshold = cv2.threshold(bgr2gray, 180, 255, cv2.THRESH_BINARY)
 
     # 01化
     bitwise_not = cv2.bitwise_not(threshold)

@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
 """
 
 SRC = './resource/secret_garden.jpg'
-target = './resource/secret_garden_tmp.jpg'
+TGT = './resource/secret_garden_tmp.jpg'
 
 import random
 
@@ -38,6 +38,9 @@ class IFMainWindow(QTW.QMainWindow):
         self.resize(1500, 800)
         self.move(200, 200)
         self.setWindowTitle("  infinity Research ")
+
+        self.src = SRC
+        self.tgt = TGT
 
         self.initMenu()
         self.initContent()
@@ -104,25 +107,20 @@ class IFMainWindow(QTW.QMainWindow):
 
         self.cnt = 0
 
+
     def change_l1(self):
         """
         :return:
         """
 
-        if self.cnt == -1:
-            self.close()
+        #if self.cnt == -1:
+        #    self.close()
+        #res = random.randint(1000, 9999) * 1.00 / 10000
 
-        res = random.randint(1000, 9999) * 1.00 / 10000
+        self.main_qw.l1.setText("重着色次数: {cnt}".format(cnt=self.cnt + 1))
+        self.cnt += 1
+        self.redraw_l2()
 
-        if res < 0.95 and self.cnt >= 0 :
-            self.main_qw.l1.setText("次数: {cnt}".format(cnt=self.cnt + 1))
-            self.cnt += 1
-            self.redraw_l2()
-        else:
-            self.main_qw.l1.setText("已成功次数: {cnt}次".format(cnt=self.cnt + 1))
-            #self.cnt = -1
-            self.cnt += 1
-            self.redraw_l2()
 
     def load_l2(self):
         """
@@ -140,14 +138,16 @@ class IFMainWindow(QTW.QMainWindow):
         """
 
         res = random.randint(1000, 9999) * 1.00 / 10000
-        if res < 0.50:
-            fill_color.fill_color_cv2(SRC, target)
-        else:
-            fill_color.fill_color_ski(SRC, target)
-
-        pm = QTG.QPixmap(target)
+        #if res < 0.50:
+        #    fill_color.fill_color_cv2(self.src, self.tgt)
+        #else:
+        #    fill_color.fill_color_ski(self.src, self.tgt)
+        fill_color.fill_color_ski(self.src, self.tgt)
+        pm = QTG.QPixmap(self.tgt)
 
         self.main_qw.l2.setPixmap(pm)
+
+        #self.src = self.tgt
 
 
 
